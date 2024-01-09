@@ -71,7 +71,6 @@ public class Jeu {
 		if(Motus.WINDOW_WIDTH < 400) { throw new IllegalArgumentException("Le WINDOW_WIDTH (largeur fenetre) < 400"); }
 		if(Motus.WINDOW_HEIGHT < 400) { throw new IllegalArgumentException("Le WINDOW_HEIGHT (hauteur fenetre) < 400"); }
 		if(Motus.NB_LETTRES < 6 || Motus.NB_LETTRES > 10) { throw new IllegalArgumentException("Le NB_LETTRES est < 6 ou > 10"); }
-		if(Motus.NB_GRILLES < 1) { throw new IllegalArgumentException("Le NB_GRILLES < 1"); }
 		if(Motus.TEMPS < 5) { throw new IllegalArgumentException("Le TEMPS < 5 secondes"); }
 	}
 
@@ -163,7 +162,7 @@ public class Jeu {
 						}
 					}
 					attendre(100); // On attend 0.1 seconde après chaque vérification
-					tempsRestant--; // - 0.1 sec (tempsRestant = centièmes de seconde)
+					tempsRestant--; // - 0.1 sec (tempsRestant = dixièmes de seconde)
 					panel.repaint();
 				}
 				fenetre.setMsgErr(null);
@@ -186,7 +185,7 @@ public class Jeu {
 			}
 
 			if(grille.resolue()) { // Le mot à été trouvé
-				 grilleReussie();
+				grilleReussie();
 			} else { // Le mot n'a pas été trouvé
 				grilleEchec(grille,tour);
 			}
