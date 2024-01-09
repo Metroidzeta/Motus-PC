@@ -3,6 +3,8 @@
 		> javac *.java
 	Pour exécuter :
 		> java Motus
+	Pour créer un jar de l'application :
+		> jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*
 */
 
 import java.awt.Color;

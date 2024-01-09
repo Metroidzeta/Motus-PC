@@ -1,6 +1,9 @@
 # Motus-PC
 Recréation en jeu vidéo du jeu télévisé Motus en Java (pour PC)  
 
+![Motus-screen-1](https://i.ibb.co/XsJr5Nn/Motus-screen-1.png)
+![Motus-screen-2](https://i.ibb.co/z6SxZxv/Motus-screen-2.png)
+
 ## POUR DEMARRER LE PROGRAMME
 
 Tout d’abord, pour compiler : ```javac *.java```  
