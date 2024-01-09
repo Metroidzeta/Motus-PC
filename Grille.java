@@ -151,7 +151,6 @@ public class Grille {
 		g.setColor(Color.WHITE);
 		g.setFont(font);
 		FontMetrics fm = g.getFontMetrics();
-
 		for(int i = 0; i < ligneActuelle + 1; i++) {
 			for(int j = 0; j < largeur; j++) {
 				char lettreC = lettresCases[i][j];

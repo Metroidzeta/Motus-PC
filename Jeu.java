@@ -37,7 +37,7 @@ public class Jeu {
 		}
 		int indiceListeMots = Motus.NB_LETTRES - 6;
 		this.partie = new Partie(listeMotsXlettres.get(indiceListeMots),Motus.NB_GRILLES);
-		this.tempsRestant = Motus.TEMPS * 10;
+		this.tempsRestant = Motus.TEMPS * 10; // Temps converti en dixièmes de seconde
 		this.lesFonts = new Font[2];
 		int firstfontSize = (int) (Math.min(Motus.WINDOW_WIDTH,Motus.WINDOW_HEIGHT) * 0.03);
 		int secondfontSize = (int) (Math.min(Motus.WINDOW_WIDTH,Motus.WINDOW_HEIGHT) * 0.1);
@@ -71,6 +71,7 @@ public class Jeu {
 		if(Motus.WINDOW_WIDTH < 400) { throw new IllegalArgumentException("Le WINDOW_WIDTH (largeur fenetre) < 400"); }
 		if(Motus.WINDOW_HEIGHT < 400) { throw new IllegalArgumentException("Le WINDOW_HEIGHT (hauteur fenetre) < 400"); }
 		if(Motus.NB_LETTRES < 6 || Motus.NB_LETTRES > 10) { throw new IllegalArgumentException("Le NB_LETTRES est < 6 ou > 10"); }
+		if(Motus.NB_GRILLES < 1) { throw new IllegalArgumentException("Le NB_GRILLES < 1"); }
 		if(Motus.TEMPS < 5) { throw new IllegalArgumentException("Le TEMPS < 5 secondes"); }
 	}
 
@@ -80,7 +81,6 @@ public class Jeu {
 			String data = myReader.nextLine(); // On récupère la première ligne
 			data = data.replaceAll("[ \"\\[\\]]", ""); // On enlève tous les espaces, les "\"", les "[" et les "]"
 			String[] mots = data.split(","); // On split les mots à chaque virgule et on met tout dans un tableau
-
 			for(String mot : mots) { // On met tous les mots en majuscules dans un Hashset
 				hs.add(mot.toUpperCase());
 			}
