@@ -1,5 +1,5 @@
 # Motus-PC
-Recréation en jeu vidéo du jeu télévisé Motus en Java (pour PC)  
+Recréation en jeu vidéo de l'ancien jeu télévisé Motus en Java (pour PC)  
 Interface graphique réalisée avec la bibliothèque swing  
 
 ![Motus-screen-1](https://i.ibb.co/XsJr5Nn/Motus-screen-1.png)
