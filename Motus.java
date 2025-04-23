@@ -17,7 +17,7 @@ public class Motus {
 	public static final int WINDOW_WIDTH = 920;
 	public static final int WINDOW_HEIGHT = 720;
 
-	public static final int NB_ESSAI = 6;
+	public static final int NB_ESSAIS = 6;
 	public static final int NB_LETTRES = 7;
 	public static final int NB_GRILLES = 10;
 	public static final int TEMPS = 30;

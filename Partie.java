@@ -32,7 +32,7 @@ public class Partie {
 		for (int i = 0; i < nbGrilles; i++) {
 			int index = random.nextInt(tailleListe - i);
 			String mot = list.remove(index); // récupérer et supprimer l'élément sélectionné
-			grilles.add(new Grille(mot, Motus.NB_ESSAI));
+			grilles.add(new Grille(mot, Motus.NB_ESSAIS));
 		}
 	}
 

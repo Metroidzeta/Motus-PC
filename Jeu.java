@@ -59,7 +59,7 @@ public class Jeu {
 				partie.getGrilleActuelle().dessinerLettres(g, lesFonts[1]);
 				String msgErr = fenetre.getMsgErr();
 				if(msgErr != null) {
-					fenetre.dessinerTexte(g, Color.RED, lesFonts[0], msgErr, // Dessiner message d'erreur (string)
+					fenetre.dessinerTexte(g, Color.RED, lesFonts[0], msgErr, // dessiner message d'erreur (string)
 						(int) (Motus.WINDOW_WIDTH * 0.15),
 						(int) (Motus.WINDOW_HEIGHT * 0.98)
 					);
