@@ -1,11 +1,15 @@
-/* Auteur du projet : Metroidzeta
-	Pour compiler avec Windows, GNU/Linux et MacOS :
-		> javac *.java
-	Pour exécuter :
-		> java Motus
-	Pour créer un jar de l'application :
-		> jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*
-*/
+/*
+ * @author Alain Barbier alias "Metroidzeta"
+ *
+ * Pour compiler avec Windows, GNU/Linux et MacOS :
+ *     > javac *.java
+ *
+ * Pour exécuter :
+ *     > java Motus
+ *
+ * Pour créer un jar de l'application :
+ *     > jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*
+ */
 
 import java.awt.Color;
 

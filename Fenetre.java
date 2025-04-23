@@ -1,106 +1,119 @@
-/* Auteur du projet : Metroidzeta
-	Pour compiler avec Windows, GNU/Linux et MacOS :
-		> javac *.java
-	Pour exécuter :
-		> java Motus
-	Pour créer un jar de l'application :
-		> jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*
-*/
+/*
+ * @author Alain Barbier alias "Metroidzeta"
+ *
+ * Pour compiler avec Windows, GNU/Linux et MacOS :
+ *     > javac *.java
+ *
+ * Pour exécuter :
+ *     > java Motus
+ *
+ * Pour créer un jar de l'application :
+ *     > jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*
+ */
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
-public class Fenetre extends JFrame implements ActionListener {
+public class Fenetre extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private final int REAL_WIDTH;
-	private final int REAL_HEIGHT;
-	private JTextField zoneTexte;
-	private JButton boutonValider;
-	private boolean boutonAppuye = false;
-	private String msgErr = null;
 
-	public Fenetre(String nom, JPanel renderer) {
-		super();
-		setTitle(nom); // Titre de la fenêtre
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Ferme le programme lorsqu'on clique sur la croix rouge
-		pack();
+	private final int realWidth;
+	private final int realHeight;
+
+	private final JTextField champTexte = new JTextField();
+	private final JButton boutonValider = new JButton("Valider");
+
+	private boolean boutonAppuye = false;
+	private String msgErr = "";
+
+	public Fenetre(String titre, JPanel renderer) {
+		super(titre);
+		setDefaultCloseOperation(EXIT_ON_CLOSE); // ferme le programme avec la croix
+		setContentPane(renderer);
+		getContentPane().setLayout(null); // placement libre
+
 		int largeur = Motus.WINDOW_WIDTH;
 		int hauteur = Motus.WINDOW_HEIGHT;
-		this.REAL_WIDTH = largeur + getInsets().left + getInsets().right;
-		this.REAL_HEIGHT = hauteur + getInsets().top + getInsets().bottom;
-		setSize(REAL_WIDTH,REAL_HEIGHT); // Taile réelle de la fenêtre (largeur * hauteur) en pixels avec les bords
 
-		zoneTexte = new JTextField();
-		zoneTexte.setBounds((int)(largeur * 0.15),hauteur - 70,(int)(largeur * 0.20),30);
+		// Initialisation des composants
+		initUI(largeur, hauteur);
 
-		boutonValider = new JButton("Valider");
-		boutonValider.setBounds((int)(largeur * 0.65),hauteur - 70,(int)(largeur * 0.20),30);
-		boutonValider.addActionListener(this);
+		setSize(largeur, hauteur); // taille "brute" de la fenêtre sans les décorations
+		setLocationRelativeTo(null); // centrer la fenêtre
+		setVisible(true); // rendre la fenêtre visible pour initialiser correctement les insets
 
-		setLocationRelativeTo(null); // Fenêtre positionné au centre
-		setContentPane(renderer);
-		getContentPane().setLayout(null);
-		getContentPane().add(zoneTexte);
+		// Ajuster la taille réelle pour inclure les bords (insets)
+		Insets insets = getInsets();
+		realWidth = largeur + insets.left + insets.right;
+		realHeight = hauteur + insets.top + insets.bottom;
+		setSize(realWidth, realHeight);
+	}
+
+	/** Initialisation de l'UI **/
+	private void initUI(int largeur, int hauteur) {
+		champTexte.setBounds((int)(largeur * 0.15), hauteur - 70, (int)(largeur * 0.20), 30);
+		boutonValider.setBounds((int)(largeur * 0.65), hauteur - 70, (int)(largeur * 0.20), 30);
+
+		boutonValider.addActionListener(e -> {
+			if (!boutonAppuye) {
+				rendreSaisieImpossible();
+				boutonAppuye = true;
+			}
+		});
+
+		getContentPane().add(champTexte);
 		getContentPane().add(boutonValider);
 	}
 
-	/*** Les getters ***/
-	public int getRealWidth() { return REAL_WIDTH; }
-	public int getRealHeight() { return REAL_HEIGHT; }
-	public String getMotSaisi() { return zoneTexte.getText(); }
+	/*** Getters ***/
+	public int getRealWidth() { return realWidth; }
+	public int getRealHeight() { return realHeight; }
+	public String getMotSaisi() { return champTexte.getText(); }
 	public boolean getBoutonAppuye() { return boutonAppuye; }
 	public String getMsgErr() { return msgErr; }
 
-	/*** Les setters ***/
-	public void rendreVisible() { setVisible(true); }
-	public void setMsgErr(String msgErr) { this.msgErr = msgErr; }
+	/*** Setters ***/
+	public void setMsgErr(String s) { msgErr = s; }
 
+	/*** Saisie ***/
+	public void rendreSaisiePossible() {
+		boutonValider.setEnabled(true);
+		champTexte.setEditable(true);
+		boutonAppuye = false;
+	}
+
+	public void rendreSaisieImpossible() {
+		boutonValider.setEnabled(false);
+		champTexte.setEditable(false);
+	}
+
+	/*** Méthodes de dessin ***/
 	public void dessinerRectangle(Graphics g, Color couleur, Rectangle rect) {
 		g.setColor(couleur);
-		g.fillRect(rect.x,rect.y,rect.width,rect.height);
+		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 
 	public void dessinerFondNoir(Graphics g) {
-		Rectangle fond = new Rectangle(0,0,Motus.WINDOW_WIDTH,Motus.WINDOW_HEIGHT);
-		dessinerRectangle(g,Color.BLACK,fond); // Rectangle background noir
+		Rectangle fond = new Rectangle(0, 0, Motus.WINDOW_WIDTH, Motus.WINDOW_HEIGHT);
+		dessinerRectangle(g, Color.BLACK, fond);
 	}
 
 	public void dessinerOvale(Graphics g, Color couleur, int x, int y, int largeur, int hauteur) {
 		g.setColor(couleur);
-		g.fillOval(x,y,largeur,hauteur);
+		g.fillOval(x, y, largeur, hauteur);
 	}
 
-	public void dessinerTexte(Graphics g, Color couleur, Font font, String str, int x, int y) {
+	public void dessinerTexte(Graphics g, Color couleur, Font font, String texte, int x, int y) {
 		g.setColor(couleur);
 		g.setFont(font);
-		g.drawString(str,x,y);
-	}
-
-	public void actionPossible() {
-		boutonValider.setEnabled(true);
-		zoneTexte.setEditable(true);
-		boutonAppuye = false;
-	}
-
-	public void actionImpossible() {
-		boutonValider.setEnabled(false);
-		zoneTexte.setEditable(false);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == boutonValider && !boutonAppuye) {
-			actionImpossible();
-			boutonAppuye = true;
-		}
+		g.drawString(texte, x, y);
 	}
 }
