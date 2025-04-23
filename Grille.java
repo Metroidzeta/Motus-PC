@@ -59,7 +59,7 @@ public class Grille {
 	private static void validerArguments(String mot, int nbEssais) {
 		if (mot == null) throw new NullPointerException("Mot null");
 		if (mot.isEmpty()) throw new IllegalArgumentException("Mot vide");
-		if (nbEssais < 1 || nbEssais > 10) throw new IllegalArgumentException("NbEssais doit être comprise entre 1 et 10");
+		if (nbEssais < 1 || nbEssais > 10) throw new IllegalArgumentException("NbEssais doit être compris entre 1 et 10");
 	}
 
 	/*** Getters ***/
