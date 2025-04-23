@@ -23,16 +23,16 @@ public class Bruitage {
 
 	private Clip son;
 
-	public Bruitage(String chemin) {
+	public Bruitage(String cheminFichier) {
 		try {
-			URL audioFileURL = getClass().getResource(chemin);
-			if(audioFileURL != null) {
+			URL audioFileURL = getClass().getResource(cheminFichier);
+			if (audioFileURL != null) {
 				try(AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFileURL)) { // try-with-resources
 					son = AudioSystem.getClip();
 					son.open(audioInputStream);
 				}
 			} else {
-				System.err.println("Le fichier audio spécifié est introuvable : " + chemin);
+				System.err.println("Le fichier audio spécifié est introuvable : " + cheminFichier);
 			}
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
 			e.printStackTrace();
@@ -40,17 +40,17 @@ public class Bruitage {
 	}
 
 	public void play() {
-		if(son != null) {
-			son.setFramePosition(0); // Positionner le lecteur au début
-			son.start(); // Jouer le bruitage
+		if (son != null) {
+			son.setFramePosition(0); // positionner le lecteur au début
+			son.start(); // jouer le bruitage
 		}
 	}
 
 	public void stop() {
-		if(son != null && son.isRunning()) son.stop();
+		if (son != null && son.isRunning()) son.stop();
 	}
 
-	public boolean enLecture() {
+	public boolean isRunning() {
 		return son != null && son.isRunning();
 	}
 

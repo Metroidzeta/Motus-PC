@@ -25,13 +25,13 @@ public class Partie {
 		validerArguments(mots, nbGrilles);
 		grilles = new ArrayList<>(nbGrilles);
 
-		List<String> list = new ArrayList<>(mots); // Convertit le set en liste pour l'accès par index
+		List<String> list = new ArrayList<>(mots); // convertit le set en liste pour l'accès par index
 		int tailleListe = list.size();
 		Random random = new Random();
 
 		for (int i = 0; i < nbGrilles; i++) {
 			int index = random.nextInt(tailleListe - i);
-			String mot = list.remove(index); // Récupérer et supprimer l'élément sélectionné
+			String mot = list.remove(index); // récupérer et supprimer l'élément sélectionné
 			grilles.add(new Grille(mot, Motus.NB_ESSAI));
 		}
 	}

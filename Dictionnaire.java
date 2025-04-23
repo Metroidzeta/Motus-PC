@@ -37,11 +37,11 @@ public class Dictionnaire {
 		try (InputStream input = Dictionnaire.class.getResourceAsStream(cheminFichier);
 			Scanner scanner = new Scanner(input)) { // try-with-resources
 			if (scanner.hasNextLine()) {
-				String[] motsExtraits = scanner.nextLine() // On récupère la première ligne
-						.replaceAll("[ \"\\[\\]]", "") // On enlève tous les espaces, les "\"", les "[" et les "]"
-						.split(","); // Chaque mot est séparé d'une virgule
+				String[] motsExtraits = scanner.nextLine() // récupère la première ligne
+						.replaceAll("[ \"\\[\\]]", "") // enlever tous les espaces, les "\"", "[" et "]"
+						.split(","); // chaque mot est séparé d'une virgule
 				for (String mot : motsExtraits) {
-					mots.add(mot.trim().toUpperCase()); // Chaque mot est inséré dans le set en majuscules
+					mots.add(mot.trim().toUpperCase()); // chaque mot est inséré dans le set en majuscules
 				}
 			}
 		} catch (IOException e) {

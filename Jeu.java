@@ -23,9 +23,9 @@ import javax.swing.JPanel;
 
 public class Jeu {
 
-	private ArrayList<Dictionnaire> dictionnaires = new ArrayList<>(5); // Dictionnaires de 6 à 10 lettres
+	private ArrayList<Dictionnaire> dictionnaires = new ArrayList<>(5); // dictionnaires de 6 à 10 lettres
 	private Partie partie;
-	private final float tempsInitial = Motus.TEMPS * 10; // Temps converti en dixièmes de seconde
+	private final float tempsInitial = Motus.TEMPS * 10; // temps converti en dixièmes de seconde
 	private float tempsRestant;
 	private Font[] lesFonts = new Font[2];
 	private Bruitage[] lesBruitages = new Bruitage[6];
@@ -59,12 +59,12 @@ public class Jeu {
 				partie.getGrilleActuelle().dessinerLettres(g, lesFonts[1]);
 				String msgErr = fenetre.getMsgErr();
 				if(msgErr != null) {
-					fenetre.dessinerTexte(g, Color.RED, lesFonts[0], msgErr, // Le message d'erreur
+					fenetre.dessinerTexte(g, Color.RED, lesFonts[0], msgErr, // Dessiner message d'erreur (string)
 						(int) (Motus.WINDOW_WIDTH * 0.15),
 						(int) (Motus.WINDOW_HEIGHT * 0.98)
 					);
 				}
-				fenetre.dessinerTexte(g, Color.WHITE , lesFonts[0] , String.format("%.1f", tempsRestant / 10), // Le temps restant
+				fenetre.dessinerTexte(g, Color.WHITE , lesFonts[0] , String.format("%.1f", tempsRestant / 10), // dessiner temps restant (string)
 					(int) (Motus.WINDOW_WIDTH * 0.80),
 					(int) (Motus.WINDOW_HEIGHT * 0.98)
 				);
@@ -108,24 +108,24 @@ public class Jeu {
 
 	private void grilleReussie() {
 		System.out.println("Bravo, le mot a été trouvé");
-		jouerBruitageEtAttendre(4, 5000); // Attendre 5 secondes
+		jouerBruitageEtAttendre(4, 5000); // attendre 5 secondes
 	}
 
 	private void grilleEchec(Grille grille) {
 		System.out.println("Echec, le mot n'a pas été trouvé");
 		char[] mot = grille.getMot().toCharArray();
 		int tour = grille.getTour();
-		jouerBruitageEtAttendre(3, 3000); // Attendre 3 secondes
+		jouerBruitageEtAttendre(3, 3000); // attendre 3 secondes
 
-		grille.viderLigne(tour); // On efface la dernière ligne
+		grille.viderLigne(tour); // efface la dernière ligne
 
-		for (int j = 0; j < mot.length; j++) { // On donne finalement la réponse qui était attendu
+		for (int j = 0; j < mot.length; j++) { // donner la réponse attendue
 			grille.setCouleursCases(tour, j , 2);
 			grille.setLettresCases(tour, j , mot[j]);
 			panel.repaint();
-			jouerBruitageEtAttendre(2, 250); // Attendre 0.25 seconde
+			jouerBruitageEtAttendre(2, 250); // attendre 0.25 seconde
 		}
-		jouerBruitageEtAttendre(5, 3000); // Attendre 3 secondes
+		jouerBruitageEtAttendre(5, 3000); // attendre 3 secondes
 	}
 
 	public void jouer() {
@@ -146,7 +146,7 @@ public class Jeu {
 
 				while (tempsRestant > 0) {
 					if (fenetre.getBoutonAppuye()) {
-						motSaisi = fenetre.getMotSaisi().toUpperCase(); // Mot transformé en majuscules
+						motSaisi = fenetre.getMotSaisi().toUpperCase(); // mot transformé en majuscules
 
 						String msg = null;
 						if (motSaisi.length() != tailleMot) msg = "Le mot doit avoir une taille de " + tailleMot + " lettres";
@@ -161,7 +161,7 @@ public class Jeu {
 							break;
 						}
 					}
-					attendre(100); // Attendre 0.1 seconde
+					attendre(100); // attendre 0.1 seconde
 					tempsRestant--; // - 0.1 sec (tempsRestant = dixièmes de seconde)
 					panel.repaint();
 				}
@@ -182,14 +182,14 @@ public class Jeu {
 					int numCouleur = grille.colorierLettre(i);
 					System.out.print(numCouleur == 2 ? "R" : (numCouleur == 1 ? "J" : "B"));
 					panel.repaint();
-					jouerBruitageEtAttendre(numCouleur, 250); // Attendre 0.25 seconde
+					jouerBruitageEtAttendre(numCouleur, 250); // attendre 0.25 seconde
 				}
 				System.out.println();
 				tour++;
 			}
 
-			if (grille.resolue()) grilleReussie(); // Le mot a été trouvé
-			else grilleEchec(grille); // Le mot n'a pas été trouvé
+			if (grille.resolue()) grilleReussie(); // le mot a été trouvé
+			else grilleEchec(grille); // le mot n'a pas été trouvé
 
 			partie.setIndiceGrilleActuelle(partie.getIndiceGrilleActuelle() + 1);
 		}
