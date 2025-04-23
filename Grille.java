@@ -43,8 +43,8 @@ public class Grille {
 		couleursCases = new int[hauteur][largeur];
 		lettresCases = new char[hauteur][largeur];
 
-		int largeurCases = (Motus.WINDOW_WIDTH - largeur - 1) / largeur; // Ajuster la largeur de la case par rapport à la largeur de la fenêtre
-		int hauteurCases = (Motus.WINDOW_HEIGHT - largeur - 100) / largeur; // Ajuster la hauteur de la case par rapport à la hauteur de la fenêtre
+		int largeurCases = (Motus.WINDOW_WIDTH - largeur - 1) / largeur; // ajuster la largeur de la case par rapport à la largeur de la fenêtre
+		int hauteurCases = (Motus.WINDOW_HEIGHT - largeur - 100) / largeur; // ajuster la hauteur de la case par rapport à la hauteur de la fenêtre
 		int offSetL = (Motus.WINDOW_WIDTH - (largeurCases * largeur) - largeur + 1) / 2;
 		for (int i = 0; i < hauteur; i++) {
 			for (int j = 0; j < largeur; j++) {
@@ -53,7 +53,7 @@ public class Grille {
 				lettresCases[i][j] = '\0';
 			}
 		}
-		lettresTrouvees = new boolean[largeur]; // Tableau booléen (false par défaut) pour savoir quelles lettres ont déjà été trouvées
+		lettresTrouvees = new boolean[largeur]; // tableau booléen (false par défaut) pour savoir quelles lettres ont déjà été trouvées
 	}
 
 	private static void validerArguments(String mot, int nbEssais) {
@@ -91,31 +91,30 @@ public class Grille {
 
 	public int colorierLettre(int i) {
 		char c = lettresCases[tour][i];
-		if (c == mot.charAt(i)) { // Si la lettre est bien positionnée
-			couleursCases[tour][i] = 2; // La case devient rouge
-			lettresTrouvees[i] = true; // On ajoute la lettre trouvée au résultat
+		if (c == mot.charAt(i)) { // la lettre est bien positionnée
+			couleursCases[tour][i] = 2; // la case devient rouge
+			lettresTrouvees[i] = true; // ajoute la lettre trouvée au résultat
 			return 2;
 		}
 		int occ = 0;
-		for (int j = 0; j < largeur; j++) { // Nombre d'occurence de cette lettre qui n'est pas à la bonne place
+		for (int j = 0; j < largeur; j++) { // nb d'occurence de cette lettre qui n'est pas à la bonne place
 			if (c == mot.charAt(j) && lettresCases[tour][j] != mot.charAt(j)) occ++;
 		}
-		for (int j = 0; j < i; j++) { // Si une lettre précédente est déjà jaune on décrémente le compteur
+		for (int j = 0; j < i; j++) { // si une lettre précédente est déjà jaune on décrémente le compteur d'occurence
 			if (c == lettresCases[tour][j] && lettresCases[tour][j] != mot.charAt(j)) occ--;
 		}
 		if (occ > 0) {
-			couleursCases[tour][i] = 1; // La case devient jaune
+			couleursCases[tour][i] = 1; // la case devient jaune
 			return 1;
 		}
-		return 0; // La case reste bleue
+		return 0; // la case reste bleue
 	}
 
 	private static void dessinerCaseBleue(Graphics g, Rectangle rect, Fenetre f) {
 		f.dessinerRectangle(g, Motus.BLEU, rect); // dessine case bleue
 	}
 
-	private static void dessinerCaseBleueAvecCercleJaune(Graphics g, Rectangle rect, Fenetre f) {
-		f.dessinerRectangle(g, Motus.BLEU, rect); // dessine case bleue
+	private static void dessinerCercleJaune(Graphics g, Rectangle rect, Fenetre f) {
 		int diam = Math.min(rect.width, rect.height) - 12;
 		int x = rect.x + (rect.width - diam) / 2;
 		int y = rect.y + (rect.height - diam) / 2;
@@ -132,7 +131,10 @@ public class Grille {
 				Rectangle rect = cases[i][j];
 				switch (couleursCases[i][j]) {
 					case 0 -> dessinerCaseBleue(g, rect, f); // mauvaise lettre
-					case 1 -> dessinerCaseBleueAvecCercleJaune(g, rect, f); // lettre à la mauvaise place
+					case 1 -> { // lettre à la mauvaise place
+						dessinerCaseBleue(g, rect, f);
+						dessinerCercleJaune(g, rect, f);
+					}
 					case 2 -> dessinerCaseRouge(g, rect, f); // lettre à la bonne place
 				}
 			}

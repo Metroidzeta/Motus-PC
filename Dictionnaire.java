@@ -38,8 +38,8 @@ public class Dictionnaire {
 			Scanner scanner = new Scanner(input)) { // try-with-resources
 			if (scanner.hasNextLine()) {
 				String[] motsExtraits = scanner.nextLine() // récupère la première ligne
-						.replaceAll("[ \"\\[\\]]", "") // enlever tous les espaces, les "\"", "[" et "]"
-						.split(","); // chaque mot est séparé d'une virgule
+					.replaceAll("[ \"\\[\\]]", "") // enlever tous les espaces, les "\"", "[" et "]"
+					.split(","); // chaque mot est séparé d'une virgule
 				for (String mot : motsExtraits) {
 					mots.add(mot.trim().toUpperCase()); // chaque mot est inséré dans le set en majuscules
 				}

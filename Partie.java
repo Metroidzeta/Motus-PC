@@ -48,6 +48,6 @@ public class Partie {
 	public Grille getGrilleActuelle() { return grilles.get(indiceGrilleActuelle); }
 	public int getIndiceGrilleActuelle() { return indiceGrilleActuelle; }
 
-	/*** Setter ***/
+	/*** Setters ***/
 	public void setIndiceGrilleActuelle(int i) { indiceGrilleActuelle = i; }
 }

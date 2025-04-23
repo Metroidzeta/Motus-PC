@@ -32,7 +32,7 @@ public class Fenetre extends JFrame {
 	private final JButton boutonValider = new JButton("Valider");
 
 	private boolean boutonAppuye = false;
-	private String msgErr = "";
+	private String msgErr = null;
 
 	public Fenetre(String titre, JPanel renderer) {
 		super(titre);
