@@ -25,7 +25,7 @@ public class Dictionnaire {
 		mots = new HashSet<>();
 		extraireListeMot(cheminFichier);
 	}
-	
+
 	/*** Getters ****/
 	public Set<String> getMots() { return mots; }
 
