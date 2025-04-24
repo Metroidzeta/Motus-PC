@@ -30,7 +30,7 @@ public class Grille {
 	private int[][] couleursCases;
 	private char[][] lettresCases;
 	private boolean[] lettresTrouvees;
-	private HashSet<String> motsSaisis = new HashSet<>();
+	private final HashSet<String> motsSaisis = new HashSet<>();
 	private boolean resolue = false;
 
 	public Grille(String mot, int nbEssais) {
@@ -121,6 +121,11 @@ public class Grille {
 		f.dessinerOvale(g, Motus.JAUNE, x , y, diam, diam); // dessine cercle jaune
 	}
 
+	private static void dessinerCaseBleueEtCercleJaune(Graphics g, Rectangle rect, Fenetre f) {
+		dessinerCaseBleue(g, rect, f);
+		dessinerCercleJaune(g, rect, f);
+	}
+
 	private static void dessinerCaseRouge(Graphics g, Rectangle rect, Fenetre f) {
 		f.dessinerRectangle(g, Motus.ROUGE, rect); // dessine case rouge
 	}
@@ -131,10 +136,7 @@ public class Grille {
 				Rectangle rect = cases[i][j];
 				switch (couleursCases[i][j]) {
 					case 0 -> dessinerCaseBleue(g, rect, f); // mauvaise lettre
-					case 1 -> { // lettre à la mauvaise place
-						dessinerCaseBleue(g, rect, f);
-						dessinerCercleJaune(g, rect, f);
-					}
+					case 1 -> dessinerCaseBleueEtCercleJaune(g, rect, f); // lettre à la mauvaise place
 					case 2 -> dessinerCaseRouge(g, rect, f); // lettre à la bonne place
 				}
 			}
@@ -146,9 +148,8 @@ public class Grille {
 		Arrays.fill(lettresCases[i], '.');
 	}
 
-	public void dessinerLettres(Graphics g, Font font) {
-		g.setColor(Color.WHITE);
-		g.setFont(font);
+	public void dessinerLettres(Graphics g, Font font, Fenetre f) {
+		g.setFont(font); // on applique d'abord la police pour que le FontMetrics ne soit pas faussé
 		FontMetrics fm = g.getFontMetrics();
 
 		for (int i = 0; i <= tour; i++) {
@@ -162,7 +163,7 @@ public class Grille {
 
 					int x = rect.x + (rect.width - largeurLettre) / 2;
 					int y = rect.y + (rect.height - hauteurLettre) / 2 + fm.getAscent();
-					g.drawString(s, x, y);
+					f.dessinerTexte(g, Color.WHITE, font, s, x, y);
 				}
 			}
 		}

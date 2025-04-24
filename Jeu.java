@@ -56,7 +56,7 @@ public class Jeu {
 				super.paintComponent(g);
 				fenetre.dessinerFondNoir(g);
 				partie.getGrilleActuelle().dessinerCouleursCases(g, fenetre);
-				partie.getGrilleActuelle().dessinerLettres(g, lesFonts[1]);
+				partie.getGrilleActuelle().dessinerLettres(g, lesFonts[1], fenetre);
 				String msgErr = fenetre.getMsgErr();
 				if(msgErr != null) {
 					fenetre.dessinerTexte(g, Color.RED, lesFonts[0], msgErr, // dessiner message d'erreur (string)
