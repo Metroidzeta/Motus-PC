@@ -23,12 +23,12 @@ import javax.swing.JPanel;
 
 public class Jeu {
 
-	private ArrayList<Dictionnaire> dictionnaires = new ArrayList<>(5); // dictionnaires de 6 à 10 lettres
+	private final ArrayList<Dictionnaire> lesDictionnaires = new ArrayList<>(5); // dictionnaires de 6 à 10 lettres
 	private Partie partie;
 	private final float tempsInitial = Motus.TEMPS * 10; // temps converti en dixièmes de seconde
 	private float tempsRestant;
-	private Font[] lesFonts = new Font[2];
-	private Bruitage[] lesBruitages = new Bruitage[6];
+	private final ArrayList<Font> lesPolices = new ArrayList<>(2);
+	private final ArrayList<Bruitage> lesBruitages = new ArrayList<>(6);
 	private JPanel panel;
 	private Fenetre fenetre;
 
@@ -36,19 +36,17 @@ public class Jeu {
 		verifierArguments();
 
 		for (int i = 0; i < 5; i++) {
-			String fichier = "listesMots/listeMots" + (i + 6) + ".json";
-			Dictionnaire dictionnaire = new Dictionnaire(fichier);
-			dictionnaires.add(dictionnaire);
+			lesDictionnaires.add(new Dictionnaire("listesMots/listeMots" + (i + 6) + ".json"));
 		}
 
 		int index = Motus.NB_LETTRES - 6;
-		partie = new Partie(dictionnaires.get(index).getMots(), Motus.NB_GRILLES);
+		partie = new Partie(lesDictionnaires.get(index).getMots(), Motus.NB_GRILLES);
 		tempsRestant = tempsInitial;
 
 		int firstfontSize = (int) (Math.min(Motus.WINDOW_WIDTH, Motus.WINDOW_HEIGHT) * 0.03);
 		int secondfontSize = (int) (Math.min(Motus.WINDOW_WIDTH, Motus.WINDOW_HEIGHT) * 0.1);
-		lesFonts[0] = new Font("Arial", Font.PLAIN, firstfontSize);
-		lesFonts[1] = new Font("Arial", Font.PLAIN, secondfontSize);
+		lesPolices.add(new Font("Arial", Font.PLAIN, firstfontSize));
+		lesPolices.add(new Font("Arial", Font.PLAIN, secondfontSize));
 		chargerBruitages();
 		panel = new JPanel() {
 			@Override
@@ -56,15 +54,15 @@ public class Jeu {
 				super.paintComponent(g);
 				fenetre.dessinerFondNoir(g);
 				partie.getGrilleActuelle().dessinerCouleursCases(g, fenetre);
-				partie.getGrilleActuelle().dessinerLettres(g, lesFonts[1], fenetre);
+				partie.getGrilleActuelle().dessinerLettres(g, lesPolices.get(1), fenetre);
 				String msgErr = fenetre.getMsgErr();
-				if(msgErr != null) {
-					fenetre.dessinerTexte(g, Color.RED, lesFonts[0], msgErr, // dessiner message d'erreur (string)
+				if (msgErr != null) {
+					fenetre.dessinerTexte(g, Color.RED, lesPolices.get(0), msgErr, // dessiner message d'erreur (string)
 						(int) (Motus.WINDOW_WIDTH * 0.15),
 						(int) (Motus.WINDOW_HEIGHT * 0.98)
 					);
 				}
-				fenetre.dessinerTexte(g, Color.WHITE , lesFonts[0] , String.format("%.1f", tempsRestant / 10), // dessiner temps restant (string)
+				fenetre.dessinerTexte(g, Color.WHITE , lesPolices.get(0), String.format("%.1f", tempsRestant / 10), // dessiner temps restant (string)
 					(int) (Motus.WINDOW_WIDTH * 0.80),
 					(int) (Motus.WINDOW_HEIGHT * 0.98)
 				);
@@ -83,7 +81,7 @@ public class Jeu {
 	private void chargerBruitages() {
 		String[] noms = {"mauvaiselettre", "lettrejaune", "bonnelettre", "mauvaismot", "reussi", "gameover"};
 		for (int i = 0; i < noms.length; i++) {
-			lesBruitages[i] = new Bruitage("bruitages/" + noms[i] + ".wav");
+			lesBruitages.add(new Bruitage("bruitages/" + noms[i] + ".wav"));
 		}
 	}
 
@@ -93,7 +91,7 @@ public class Jeu {
 	}
 
 	private boolean dansDictionnaire(String mot) {
-		return dictionnaires.get(mot.length() - 6).contains(mot);
+		return lesDictionnaires.get(mot.length() - 6).contains(mot);
 	}
 
 	private void attendre(long ms) {
@@ -101,9 +99,9 @@ public class Jeu {
 	}
 
 	private void jouerBruitageEtAttendre(int num, long ms) {
-		lesBruitages[num].play();
+		lesBruitages.get(num).play();
 		attendre(ms);
-		lesBruitages[num].stop();
+		lesBruitages.get(num).stop();
 	}
 
 	private void grilleReussie() {
@@ -137,7 +135,7 @@ public class Jeu {
 
 			while (!grille.resolue() && tour < nbEssais) {
 				grille.setTour(tour);
-				grille.preRemplirLigne();
+				grille.initLigne();
 				tempsRestant = tempsInitial;
 				panel.repaint();
 

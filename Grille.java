@@ -75,7 +75,7 @@ public class Grille {
 	public void setCouleursCases(int i, int j, int num) { couleursCases[i][j] = num; }
 	public void setLettresCases(int i, int j, char c) { lettresCases[i][j] = c; }
 
-	public void preRemplirLigne() {
+	public void initLigne() {
 		char firstChar = mot.charAt(0);
 		for (int j = 0; j < largeur; j++) {
 			lettresCases[tour][j] = (j == 0 || mot.charAt(j) == firstChar || lettresTrouvees[j]) ? mot.charAt(j) : '.';

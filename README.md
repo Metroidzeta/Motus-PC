@@ -8,5 +8,5 @@ Interface graphique réalisée avec la bibliothèque standard swing
 ## POUR DEMARRER LE PROGRAMME
 
 Tout d’abord, pour compiler : ```javac *.java```  
-Pour exécuter : ```java Motus```  
+Pour exécuter : ```java Motus```  (ou lancer Motus.jar)  
 Pour créer un jar de l'application : ```jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*```  
