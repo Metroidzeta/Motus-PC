@@ -175,7 +175,7 @@ public class Jeu {
 				panel.repaint();
 
 				String motSaisi = attendreSaisie(tailleMot, grille);
-                fenetre.setMsgErr(null);
+				fenetre.setMsgErr(null);
 
 				if (motSaisi == null) {
 					fenetre.bloquerSaisie();

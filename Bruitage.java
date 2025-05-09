@@ -62,8 +62,8 @@ public class Bruitage {
 	}
 
 	public boolean isRunning() {
-        return son != null && son.isRunning();
-    }
+		return son != null && son.isRunning();
+	}
 
 	public void close() {
 		if (son != null && son.isOpen()) son.close();
