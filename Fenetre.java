@@ -29,9 +29,9 @@ public class Fenetre extends JFrame {
 	private final int realHeight;
 
 	private final JTextField champTexte = new JTextField();
-	private final JButton boutonValider = new JButton("Valider");
+	private final JButton btnValider = new JButton("Valider");
 
-	private boolean boutonAppuye = false;
+	private boolean btnValiderAppuye;
 	private String msgErr = null;
 
 	public Fenetre(String titre, JPanel renderer) {
@@ -60,39 +60,39 @@ public class Fenetre extends JFrame {
 	/** Initialisation de l'UI **/
 	private void initUI(int largeur, int hauteur) {
 		champTexte.setBounds((int)(largeur * 0.15), hauteur - 70, (int)(largeur * 0.20), 30);
-		boutonValider.setBounds((int)(largeur * 0.65), hauteur - 70, (int)(largeur * 0.20), 30);
+		btnValider.setBounds((int)(largeur * 0.65), hauteur - 70, (int)(largeur * 0.20), 30);
 
-		boutonValider.addActionListener(e -> {
-			if (!boutonAppuye) {
-				rendreSaisieImpossible();
-				boutonAppuye = true;
+		btnValider.addActionListener(e -> {
+			if (!btnValiderAppuye) {
+				bloquerSaisie();
+				btnValiderAppuye = true;
 			}
 		});
 
 		getContentPane().add(champTexte);
-		getContentPane().add(boutonValider);
+		getContentPane().add(btnValider);
 	}
 
 	/*** Getters ***/
 	public int getRealWidth() { return realWidth; }
 	public int getRealHeight() { return realHeight; }
 	public String getMotSaisi() { return champTexte.getText(); }
-	public boolean getBoutonAppuye() { return boutonAppuye; }
+	public boolean getBtnValiderAppuye() { return btnValiderAppuye; }
 	public String getMsgErr() { return msgErr; }
 
 	/*** Setters ***/
 	public void setMsgErr(String s) { msgErr = s; }
 
 	/*** Saisie ***/
-	public void rendreSaisiePossible() {
-		boutonValider.setEnabled(true);
-		champTexte.setEditable(true);
-		boutonAppuye = false;
+	public void bloquerSaisie() {
+		btnValider.setEnabled(false);
+		champTexte.setEditable(false);
 	}
 
-	public void rendreSaisieImpossible() {
-		boutonValider.setEnabled(false);
-		champTexte.setEditable(false);
+	public void debloquerSaisie() {
+		btnValider.setEnabled(true);
+		champTexte.setEditable(true);
+		btnValiderAppuye = false;
 	}
 
 	/*** Méthodes de dessin ***/
@@ -111,9 +111,9 @@ public class Fenetre extends JFrame {
 		g.fillOval(x, y, largeur, hauteur);
 	}
 
-	public void dessinerTexte(Graphics g, Color couleur, Font font, String texte, int x, int y) {
+	public void dessinerTexte(Graphics g, Color couleur, Font police, String texte, int x, int y) {
 		g.setColor(couleur);
-		g.setFont(font);
+		g.setFont(police);
 		g.drawString(texte, x, y);
 	}
 }

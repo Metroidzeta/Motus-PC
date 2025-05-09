@@ -18,7 +18,9 @@ import java.util.Random;
 
 public class Partie {
 
-	private List<Grille> grilles;
+	private static final Random random = new Random();
+
+	private final List<Grille> grilles;
 	private int indiceGrilleActuelle = 0;
 
 	public Partie(Set<String> mots, int nbGrilles) {
@@ -26,20 +28,17 @@ public class Partie {
 		grilles = new ArrayList<>(nbGrilles);
 
 		List<String> list = new ArrayList<>(mots); // convertit le set en liste pour l'accès par index
-		int tailleListe = list.size();
-		Random random = new Random();
 
 		for (int i = 0; i < nbGrilles; i++) {
-			int index = random.nextInt(tailleListe - i);
+			int index = random.nextInt(list.size() - i);
 			String mot = list.remove(index); // récupérer et supprimer l'élément sélectionné
 			grilles.add(new Grille(mot, Motus.NB_ESSAIS));
 		}
 	}
 
 	private static void validerArguments(Set<String> mots, int nbGrilles) {
-		if (mots == null) throw new NullPointerException("Le set de mots est null");
-		if (mots.isEmpty()) throw new IllegalArgumentException("Le set de mots est vide");
-		if (nbGrilles < 1) throw new IllegalArgumentException("Le nombre de grilles de la partie doit être >= 1");
+		if (mots == null || mots.isEmpty()) throw new IllegalArgumentException("Set de mots null ou vide");
+		if (nbGrilles < 1) throw new IllegalArgumentException("NbGrilles partie < 1");
 		if (nbGrilles > mots.size()) throw new IllegalArgumentException("Pas assez de mots pour générer " + nbGrilles + " grilles uniques");
 	}
 

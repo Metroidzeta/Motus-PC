@@ -27,11 +27,12 @@ public class Grille {
 	private final int largeur;
 	private int tour = 0;
 	private final Rectangle[][] cases;
-	private int[][] couleursCases;
-	private char[][] lettresCases;
-	private boolean[] lettresTrouvees;
+	private final int[][] couleursCases;
+	private final char[][] lettresCases;
+	private final boolean[] lettresTrouvees;
 	private final HashSet<String> motsSaisis = new HashSet<>();
-	private boolean resolue = false;
+
+	private boolean resolue;
 
 	public Grille(String mot, int nbEssais) {
 		validerArguments(mot, nbEssais);
@@ -57,9 +58,8 @@ public class Grille {
 	}
 
 	private static void validerArguments(String mot, int nbEssais) {
-		if (mot == null) throw new NullPointerException("Mot null");
-		if (mot.isEmpty()) throw new IllegalArgumentException("Mot vide");
-		if (nbEssais < 1 || nbEssais > 10) throw new IllegalArgumentException("NbEssais doit être compris entre 1 et 10");
+		if (mot == null || mot.isBlank()) throw new IllegalArgumentException("Mot null ou vide");
+		if (nbEssais < 1 || nbEssais > 10) throw new IllegalArgumentException("NbEssais < 1 ou > 10");
 	}
 
 	/*** Getters ***/
@@ -75,6 +75,7 @@ public class Grille {
 	public void setCouleursCases(int i, int j, int num) { couleursCases[i][j] = num; }
 	public void setLettresCases(int i, int j, char c) { lettresCases[i][j] = c; }
 
+	/*** Autres méthodes ***/
 	public void initLigne() {
 		char firstChar = mot.charAt(0);
 		for (int j = 0; j < largeur; j++) {
@@ -96,17 +97,21 @@ public class Grille {
 			lettresTrouvees[i] = true; // ajoute la lettre trouvée au résultat
 			return 2;
 		}
+
 		int occ = 0;
+
 		for (int j = 0; j < largeur; j++) { // nb d'occurence de cette lettre qui n'est pas à la bonne place
 			if (c == mot.charAt(j) && lettresCases[tour][j] != mot.charAt(j)) occ++;
 		}
 		for (int j = 0; j < i; j++) { // si une lettre précédente est déjà jaune on décrémente le compteur d'occurence
 			if (c == lettresCases[tour][j] && lettresCases[tour][j] != mot.charAt(j)) occ--;
 		}
+
 		if (occ > 0) {
 			couleursCases[tour][i] = 1; // la case devient jaune
 			return 1;
 		}
+
 		return 0; // la case reste bleue
 	}
 
@@ -172,18 +177,18 @@ public class Grille {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Grille g)) return false;
+		if (!(o instanceof Grille grille)) return false;
 
-		return mot.equals(g.mot)
-			&& hauteur == g.hauteur
-			&& largeur == g.largeur
-			&& tour == g.tour
-			&& Arrays.deepEquals(cases, g.cases)
-			&& Arrays.deepEquals(couleursCases, g.couleursCases)
-			&& Arrays.deepEquals(lettresCases, g.lettresCases)
-			&& Arrays.equals(lettresTrouvees, g.lettresTrouvees)
-			&& motsSaisis.equals(g.motsSaisis)
-			&& resolue == g.resolue;
+		return mot.equals(grille.mot)
+			&& hauteur == grille.hauteur
+			&& largeur == grille.largeur
+			&& tour == grille.tour
+			&& Arrays.deepEquals(cases, grille.cases)
+			&& Arrays.deepEquals(couleursCases, grille.couleursCases)
+			&& Arrays.deepEquals(lettresCases, grille.lettresCases)
+			&& Arrays.equals(lettresTrouvees, grille.lettresTrouvees)
+			&& motsSaisis.equals(grille.motsSaisis)
+			&& resolue == grille.resolue;
 	}
 
 	@Override

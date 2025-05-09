@@ -11,36 +11,47 @@
  *     > jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*
  */
 
-import java.io.IOException;
-import java.net.URL;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Bruitage {
 
-	private Clip son;
+	private static final String DOSSIER = "bruitages";
 
-	public Bruitage(String cheminFichier) {
-		try {
-			URL audioFileURL = getClass().getResource(cheminFichier);
-			if (audioFileURL != null) {
-				try(AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFileURL)) { // try-with-resources
-					son = AudioSystem.getClip();
-					son.open(audioInputStream);
-				}
-			} else {
-				System.err.println("Le fichier audio spécifié est introuvable : " + cheminFichier);
-			}
+	private final Clip son;
+
+	public Bruitage(String nomFichier) {
+		validerArguments(nomFichier);
+		son = initClip(nomFichier);
+		if (son == null) throw new IllegalStateException("Impossible de charger le fichier audio : " + nomFichier);
+	}
+
+	private static void validerArguments(String nomFichier) {
+		if (nomFichier == null || nomFichier.isBlank()) throw new IllegalArgumentException("nomFichier null ou vide");
+	}
+
+	private Clip initClip(String nomFichier) {
+		Path chemin = Paths.get(DOSSIER, nomFichier);
+		try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(chemin.toFile())) { // try-with-resources
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioInputStream);
+			return clip;
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+			System.err.println("Erreur lors du chargement du bruitage : " + chemin);
 			e.printStackTrace();
+			return null;
 		}
 	}
 
+	/*** Autre méthodes ***/
 	public void play() {
-		if (son != null) {
+		if (son != null && son.isOpen()) {
 			son.setFramePosition(0); // positionner le lecteur au début
 			son.start(); // jouer le bruitage
 		}
@@ -51,10 +62,10 @@ public class Bruitage {
 	}
 
 	public boolean isRunning() {
-		return son != null && son.isRunning();
-	}
+        return son != null && son.isRunning();
+    }
 
 	public void close() {
-		if (son != null) son.close();
+		if (son != null && son.isOpen()) son.close();
 	}
 }

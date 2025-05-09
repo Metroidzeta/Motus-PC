@@ -15,160 +15,171 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.regex.Pattern;
 import java.text.Normalizer;
 import javax.swing.JPanel;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Jeu {
 
-	private final ArrayList<Dictionnaire> lesDictionnaires = new ArrayList<>(5); // dictionnaires de 6 à 10 lettres
+	private static final float TEMPS_INITIAL = Motus.TEMPS * 10;
+	private static final String[] BRUITAGE_NOMS = {"mauvaiselettre", "lettrejaune", "bonnelettre", "mauvaismot", "reussi", "gameover"};
+	private static final int MIN_WINDOW_SIZE = 400;
+
+	private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+	private final ArrayList<Dictionnaire> dictionnaires = new ArrayList<>(5);
+	private final ArrayList<Font> polices = new ArrayList<>(2);
+	private final ArrayList<Bruitage> bruitages = new ArrayList<>(6);
 	private Partie partie;
-	private final float tempsInitial = Motus.TEMPS * 10; // temps converti en dixièmes de seconde
 	private float tempsRestant;
-	private final ArrayList<Font> lesPolices = new ArrayList<>(2);
-	private final ArrayList<Bruitage> lesBruitages = new ArrayList<>(6);
 	private JPanel panel;
 	private Fenetre fenetre;
 
 	public Jeu() {
-		verifierArguments();
-
-		for (int i = 0; i < 5; i++) {
-			lesDictionnaires.add(new Dictionnaire("listesMots/listeMots" + (i + 6) + ".json"));
-		}
-
-		int index = Motus.NB_LETTRES - 6;
-		partie = new Partie(lesDictionnaires.get(index).getMots(), Motus.NB_GRILLES);
-		tempsRestant = tempsInitial;
-
-		int firstfontSize = (int) (Math.min(Motus.WINDOW_WIDTH, Motus.WINDOW_HEIGHT) * 0.03);
-		int secondfontSize = (int) (Math.min(Motus.WINDOW_WIDTH, Motus.WINDOW_HEIGHT) * 0.1);
-		lesPolices.add(new Font("Arial", Font.PLAIN, firstfontSize));
-		lesPolices.add(new Font("Arial", Font.PLAIN, secondfontSize));
+		validerArguments();
+		chargerDictionnaires();
+		initPartie();
+		initUI();
 		chargerBruitages();
+	}
+
+	private static void validerArguments() {
+		if (Motus.WINDOW_WIDTH < MIN_WINDOW_SIZE) throw new IllegalArgumentException("WINDOW_WIDTH trop petite (largeur fenetre)");
+		if (Motus.WINDOW_HEIGHT < MIN_WINDOW_SIZE) throw new IllegalArgumentException("WINDOW_HEIGHT trop petite (hauteur fenetre)");
+		if (Motus.NB_LETTRES < 6 || Motus.NB_LETTRES > 10) throw new IllegalArgumentException("NB_LETTRES doit être entre 6 et 10");
+		if (Motus.TEMPS < 5) throw new IllegalArgumentException("Temps trop court (< 5 sec)");
+	}
+
+	private void chargerDictionnaires() {
+		for (int i = 0; i < 5; i++) {
+			dictionnaires.add(new Dictionnaire("listeMots" + (i + 6) + ".json"));
+		}
+	}
+
+	private void initPartie() {
+		int index = Motus.NB_LETTRES - 6;
+		partie = new Partie(dictionnaires.get(index).getMots(), Motus.NB_GRILLES);
+		tempsRestant = TEMPS_INITIAL;
+	}
+
+	private void initUI() {
+		int minSize = Math.min(Motus.WINDOW_WIDTH, Motus.WINDOW_HEIGHT);
+		polices.add(new Font("Arial", Font.PLAIN, (int) (minSize * 0.03)));
+		polices.add(new Font("Arial", Font.PLAIN, (int) (minSize * 0.1)));
 		panel = new JPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				fenetre.dessinerFondNoir(g);
-				partie.getGrilleActuelle().dessinerCouleursCases(g, fenetre);
-				partie.getGrilleActuelle().dessinerLettres(g, lesPolices.get(1), fenetre);
-				String msgErr = fenetre.getMsgErr();
-				if (msgErr != null) {
-					fenetre.dessinerTexte(g, Color.RED, lesPolices.get(0), msgErr, // dessiner message d'erreur (string)
-						(int) (Motus.WINDOW_WIDTH * 0.15),
-						(int) (Motus.WINDOW_HEIGHT * 0.98)
-					);
-				}
-				fenetre.dessinerTexte(g, Color.WHITE , lesPolices.get(0), String.format("%.1f", tempsRestant / 10), // dessiner temps restant (string)
-					(int) (Motus.WINDOW_WIDTH * 0.80),
-					(int) (Motus.WINDOW_HEIGHT * 0.98)
-				);
+				dessiner(g);
 			}
 		};
 		fenetre = new Fenetre("Motus", panel);
 	}
 
-	private static void verifierArguments() {
-		if (Motus.WINDOW_WIDTH < 400) throw new IllegalArgumentException("WINDOW_WIDTH (largeur de la fenetre trop petite) < 400");
-		if (Motus.WINDOW_HEIGHT < 400) throw new IllegalArgumentException("WINDOW_HEIGHT (hauteur de la fenetre trop petite) < 400");
-		if (Motus.NB_LETTRES < 6 || Motus.NB_LETTRES > 10) throw new IllegalArgumentException("NB_LETTRES doit être entre 6 et 10");
-		if (Motus.TEMPS < 5) throw new IllegalArgumentException("Temps trop court (< 5 sec)");
+	private void dessiner(Graphics g) {
+		fenetre.dessinerFondNoir(g);
+		Grille grille = partie.getGrilleActuelle();
+		grille.dessinerCouleursCases(g, fenetre);
+		grille.dessinerLettres(g, polices.get(1), fenetre);
+
+		String msgErr = fenetre.getMsgErr();
+		if (msgErr != null) {
+			fenetre.dessinerTexte(g, Color.RED, polices.get(0), msgErr,
+					(int) (Motus.WINDOW_WIDTH * 0.15),
+					(int) (Motus.WINDOW_HEIGHT * 0.98)
+			);
+		}
+
+		fenetre.dessinerTexte(g, Color.WHITE, polices.get(0), String.format("%.1f", tempsRestant / 10),
+				(int) (Motus.WINDOW_WIDTH * 0.80),
+				(int) (Motus.WINDOW_HEIGHT * 0.98)
+		);
 	}
 
 	private void chargerBruitages() {
-		String[] noms = {"mauvaiselettre", "lettrejaune", "bonnelettre", "mauvaismot", "reussi", "gameover"};
-		for (int i = 0; i < noms.length; i++) {
-			lesBruitages.add(new Bruitage("bruitages/" + noms[i] + ".wav"));
+		for (String nom : BRUITAGE_NOMS) {
+			bruitages.add(new Bruitage(nom + ".wav"));
 		}
 	}
 
 	private boolean contientAccents(String mot) {
-		String norm = Normalizer.normalize(mot, Normalizer.Form.NFD);
-		return Pattern.compile("\\p{M}").matcher(norm).find();
+		return Pattern.compile("\\p{M}").matcher(Normalizer.normalize(mot, Normalizer.Form.NFD)).find();
 	}
 
 	private boolean dansDictionnaire(String mot) {
-		return lesDictionnaires.get(mot.length() - 6).contains(mot);
+		int index = mot.length() - 6;
+		return dictionnaires.get(index).contains(mot);
 	}
 
 	private void attendre(long ms) {
-		try { Thread.sleep(ms); } catch (InterruptedException ie) {}
+		try { Thread.sleep(ms); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
 	}
 
-	private void jouerBruitageEtAttendre(int num, long ms) {
-		lesBruitages.get(num).play();
-		attendre(ms);
-		lesBruitages.get(num).stop();
+	private void attendreEtJouerBruitage(int num, long ms) {
+		try {
+			CountDownLatch latch = new CountDownLatch(1); // synchroniser l'attente
+			bruitages.get(num).play();
+
+			// Planifie l'arrêt du bruitage après 'ms' millisecondes et signale la fin de l'attente
+			scheduler.schedule(() -> {
+				bruitages.get(num).stop(); // arrete le bruitage après la durée spécifiée
+				latch.countDown(); // attente terminée
+			}, ms, TimeUnit.MILLISECONDS);
+
+			latch.await(); // bloque thread principal jusqu'à ce que countDown() soit appelé
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			Thread.currentThread().interrupt();
+		}
 	}
 
-	private void grilleReussie() {
+	private void afficherReussite() {
 		System.out.println("Bravo, le mot a été trouvé");
-		jouerBruitageEtAttendre(4, 5000); // attendre 5 secondes
+		attendreEtJouerBruitage(4, 5000); // attendre 5 secondes
 	}
 
-	private void grilleEchec(Grille grille) {
+	private void afficherEchec(Grille grille) {
 		System.out.println("Echec, le mot n'a pas été trouvé");
 		char[] mot = grille.getMot().toCharArray();
 		int tour = grille.getTour();
-		jouerBruitageEtAttendre(3, 3000); // attendre 3 secondes
 
+		attendreEtJouerBruitage(3, 3000); // attendre 3 secondes
 		grille.viderLigne(tour); // efface la dernière ligne
 
 		for (int j = 0; j < mot.length; j++) { // donner la réponse attendue
 			grille.setCouleursCases(tour, j , 2);
 			grille.setLettresCases(tour, j , mot[j]);
 			panel.repaint();
-			jouerBruitageEtAttendre(2, 250); // attendre 0.25 seconde
+			attendreEtJouerBruitage(2, 250); // attendre 0.25 seconde
 		}
-		jouerBruitageEtAttendre(5, 3000); // attendre 3 secondes
+
+		attendreEtJouerBruitage(5, 3000); // attendre 3 secondes
 	}
 
 	public void jouer() {
 		for (Grille grille : partie.getGrilles()) {
 			int tour = 0;
-			int nbEssais = grille.getHauteur();
+			int maxTours = grille.getHauteur();
 			int tailleMot = grille.getLargeur();
+
 			System.out.println("Mot mystère = " + grille.getMot());
 
-			while (!grille.resolue() && tour < nbEssais) {
+			while (!grille.resolue() && tour < maxTours) {
 				grille.setTour(tour);
 				grille.initLigne();
-				tempsRestant = tempsInitial;
+				tempsRestant = TEMPS_INITIAL;
+				fenetre.debloquerSaisie();
 				panel.repaint();
 
-				String motSaisi = "";
-				fenetre.rendreSaisiePossible();
+				String motSaisi = attendreSaisie(tailleMot, grille);
+                fenetre.setMsgErr(null);
 
-				while (tempsRestant > 0) {
-					if (fenetre.getBoutonAppuye()) {
-						motSaisi = fenetre.getMotSaisi().toUpperCase(); // mot transformé en majuscules
-
-						String msg = null;
-						if (motSaisi.length() != tailleMot) msg = "Le mot doit avoir une taille de " + tailleMot + " lettres";
-						else if (contientAccents(motSaisi)) msg = "Les accents sont interdits";
-						else if (!dansDictionnaire(motSaisi)) msg = "Mot inconnu du dictionnaire";
-						else if (grille.getLesMotsSaisis().contains(motSaisi)) msg = "Mot déjà utilisé";
-
-						if (msg != null) {
-							fenetre.setMsgErr(msg);
-							fenetre.rendreSaisiePossible();
-						} else {
-							break;
-						}
-					}
-					attendre(100); // attendre 0.1 seconde
-					tempsRestant--; // - 0.1 sec (tempsRestant = dixièmes de seconde)
-					panel.repaint();
-				}
-
-				fenetre.setMsgErr(null);
-
-				if (tempsRestant == 0) {
+				if (motSaisi == null) {
+					fenetre.bloquerSaisie();
 					System.out.println("Temps écoulé");
-					fenetre.rendreSaisieImpossible();
 					break;
 				}
 
@@ -180,17 +191,49 @@ public class Jeu {
 					int numCouleur = grille.colorierLettre(i);
 					System.out.print(numCouleur == 2 ? "R" : (numCouleur == 1 ? "J" : "B"));
 					panel.repaint();
-					jouerBruitageEtAttendre(numCouleur, 250); // attendre 0.25 seconde
+					attendreEtJouerBruitage(numCouleur, 250); // attendre 0.25 seconde
 				}
+
 				System.out.println();
 				tour++;
 			}
 
-			if (grille.resolue()) grilleReussie(); // le mot a été trouvé
-			else grilleEchec(grille); // le mot n'a pas été trouvé
+			if (grille.resolue()) afficherReussite(); // le mot a été trouvé
+			else afficherEchec(grille); // le mot n'a pas été trouvé
 
 			partie.setIndiceGrilleActuelle(partie.getIndiceGrilleActuelle() + 1);
 		}
+		scheduler.shutdown(); // arrêter le scheduler
+		fermerBruitages();
 		System.exit(0);
+	}
+
+	private String attendreSaisie(int tailleMot, Grille grille) {
+		while (tempsRestant > 0) {
+			if (fenetre.getBtnValiderAppuye()) {
+				String mot = fenetre.getMotSaisi().toUpperCase();
+				String msgErr = validerMot(mot, tailleMot, grille);
+
+				if (msgErr == null) return mot;
+				fenetre.setMsgErr(msgErr);
+				fenetre.debloquerSaisie();
+			}
+			attendre(100);
+			tempsRestant--;
+			panel.repaint();
+		}
+		return null;
+	}
+
+	private String validerMot(String mot, int tailleMot, Grille grille) {
+		if (mot.length() != tailleMot) return "Le mot doit avoir une taille de " + tailleMot + " lettres";
+		if (contientAccents(mot)) return "Les accents sont interdits";
+		if (!dansDictionnaire(mot)) return "Mot inconnu du dictionnaire";
+		if (grille.getLesMotsSaisis().contains(mot)) return "Mot déjà utilisé";
+		return null;
+	}
+
+	private void fermerBruitages() {
+		bruitages.forEach(Bruitage::close);
 	}
 }

@@ -11,41 +11,63 @@
  *     > jar cvmf MANIFEST.MF Motus.jar *.class bruitages/* listesMots/*
  */
 
-import java.io.InputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Dictionnaire {
 
-	private Set<String> mots;
+	private static final String DOSSIER = "listesMots";
 
-	public Dictionnaire(String cheminFichier) {
-		mots = new HashSet<>();
-		extraireListeMot(cheminFichier);
+	private final Set<String> mots = new HashSet<>();
+
+	public Dictionnaire(String nomFichier) {
+		validerArguments(nomFichier);
+		extraireListeMot(nomFichier);
+	}
+
+	private static void validerArguments(String nomFichier) {
+		if (nomFichier == null || nomFichier.isBlank()) throw new IllegalArgumentException("nomFichier null ou vide");
+	}
+
+	private void extraireListeMot(String nomFichier) {
+		Path chemin = Paths.get(DOSSIER, nomFichier);
+		try (BufferedReader reader = Files.newBufferedReader(chemin)) { // try-with-resources
+			String ligne = reader.readLine(); // lire la première ligne
+			if (ligne != null) {
+				String[] motsExtraits = ligne
+					.replaceAll("[ \"\\[\\]]", "") // enlever tous les espaces, les "\"", "[" et "]"
+					.split(","); // séparer chaque mot par une virgule
+				for (String mot : motsExtraits) {
+					mots.add(mot.trim().toUpperCase()); // ajouter chaque mot en majuscules
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Erreur lors de la lecture du fichier : " + chemin);
+			e.printStackTrace();
+		}
 	}
 
 	/*** Getters ****/
 	public Set<String> getMots() { return mots; }
 
+	/*** Autres méthodes ***/
 	public boolean contains(String mot) {
 		return mots.contains(mot);
 	}
 
-	private void extraireListeMot(String cheminFichier) {
-		try (InputStream input = Dictionnaire.class.getResourceAsStream(cheminFichier);
-			Scanner scanner = new Scanner(input)) { // try-with-resources
-			if (scanner.hasNextLine()) {
-				String[] motsExtraits = scanner.nextLine() // récupère la première ligne
-					.replaceAll("[ \"\\[\\]]", "") // enlever tous les espaces, les "\"", "[" et "]"
-					.split(","); // chaque mot est séparé d'une virgule
-				for (String mot : motsExtraits) {
-					mots.add(mot.trim().toUpperCase()); // chaque mot est inséré dans le set en majuscules
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Dictionnaire dictionnaire)) return false;
+
+		return mots.equals(dictionnaire.mots);
 	}
+
+	@Override
+	public int hashCode() { return mots.hashCode(); }
 }
